@@ -1,14 +1,18 @@
 $ENV:OS_USERNAME="admin"
 $ENV:OS_TENANT_NAME="admin"
 $ENV:OS_PASSWORD="your_password"
-$ENV:OS_AUTH_URL="http://your_server:35357/v2.0/"
+$ENV:OS_AUTH_URL="http://your_host/v2.0/"
 
 $image_cache_path = "C:\OpenStack\Instances\_base"
 $instance_name_pattern = "instance-*"
 
 function Get-OpenStackImageIds {
-    $image_ids = @()
     $out = nova image-list
+	if ($LastExitCode -ne 0) {
+		throw "nova image-list failed with exit code $LastExitCode."
+	}
+
+    $image_ids = @()
     foreach($line in $out) {
         if ($line -Match "\|\s([0-9a-f\-]+)\s\|") {
             $image_ids += $matches[1]
